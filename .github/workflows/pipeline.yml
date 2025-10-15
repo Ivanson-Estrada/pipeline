@@ -6,16 +6,38 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: python hello.py
+      # 1. Clona tu repositorio en el runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configura la versión de Python que necesitas
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # 3. (Opcional pero recomendado) Instala las dependencias
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Ejecuta tu script
+      - name: Run test script
+        run: python hello.py
+
   build:
+    # Este job necesita que 'test' termine con éxito para empezar
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/upload-artifact@v2
+      # Clona el repositorio de nuevo para este job
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Sube los archivos del proyecto como un "artefacto"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: hello
+          name: hello-artifact
           path: .
-      
-      
